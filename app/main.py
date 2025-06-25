@@ -1,15 +1,11 @@
 from pathlib import Path
-from typing import Annotated
-
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.security import OAuth2PasswordBearer
-from fastapi_htmx import htmx, htmx_init
+from app.routes import auth
 
 app = FastAPI()
 templates = Jinja2Templates(directory=Path("app") / "templates")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -20,3 +16,5 @@ async def index(request: Request):
             "greeting": "Hello, World!"
         }
     )
+
+app.include_router(auth.router, prefix="/auth")
