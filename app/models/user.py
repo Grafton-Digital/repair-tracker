@@ -1,16 +1,16 @@
-from typing import Annotated
 import uuid
-from fastapi import Depends
 from pydantic import EmailStr
 from sqlmodel import Field, SQLModel
 
 class UserBase(SQLModel):
-    id: int
-    username: str = Field(unique=True, index=True, max_length=50)
     email: EmailStr = Field(unique=True, index=True, max_length=255)
     full_name: str = Field(default=None, max_length=255)
     is_active: bool = True
     is_superuser: bool = False
+
+class User(UserBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    hashed_password: str
 
 class UserCreate(UserBase):
     password: str = Field(min_length=8, max_length=128)
