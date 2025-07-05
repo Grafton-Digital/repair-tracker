@@ -5,7 +5,7 @@ from sqlmodel import SQLModel
 
 from app.config import settings
 from app.database import engine
-from app import models
+from app import models # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

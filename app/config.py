@@ -4,7 +4,7 @@ from pydantic import AnyUrl, computed_field
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file='../.env',
+        env_file='.env',
         env_file_encoding='utf-8',
         case_sensitive=True,
     )
@@ -35,5 +35,9 @@ class Settings(BaseSettings):
     # Application settings
     APP_NAME: str = 'My FastAPI App'
     APP_VERSION: str = '1.0.0'
+    JWT_ALGORITHM: str = 'HS256'
+    SECRET_KEY: str = 'change_this_secret_key'
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080 # 7 days
+    SECURE_COOKIES: bool = True  # Set to True in production
 
 settings = Settings()
