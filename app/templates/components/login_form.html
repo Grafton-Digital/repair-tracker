@@ -1,10 +1,8 @@
 <section class="container">
     <form 
-        class="login-form" 
+        class="login-form"
         method="POST" 
-        hx-post="/auth/login" 
-        hx-target="#login-response" 
-        hx-swap="innerHTML"
+        action="/auth/login?next={{ next | default('/') }}" 
     >
         <h1>Login</h1>
         <label for="username">Username</label>
@@ -12,6 +10,8 @@
         
         <label for="password">Password</label>
         <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        
+        <input type="hidden" name="next" value="{{ next | default('/') }}">
         
         <button type="submit" class="contrast">Login</button>
         <p>
