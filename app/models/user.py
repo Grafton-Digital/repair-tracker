@@ -6,12 +6,14 @@ from sqlmodel import Field, SQLModel, Session, select
 from app.utils.security import get_password_hash
 
 class UserBase(SQLModel):
-    email: EmailStr = Field(unique=True, index=True, max_length=255)
-    full_name: str = Field(default=None, max_length=255)
-    is_active: bool = True
-    is_superuser: bool = False
+    email: EmailStr = Field(unique=True, index=True, max_length=255, nullable=False)
+    full_name: str = Field(default=None, max_length=255, nullable=True)
+    is_active: bool = Field(default=True, nullable=False)
+    is_superuser: bool = Field(default=False, nullable=False)
 
 class User(UserBase, table=True):
+    __tablename__ = "users"
+
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str   
 
