@@ -1,5 +1,67 @@
 {% extends "layouts/default.html" %}
 
 {% block content %}
-    {{ greeting }}
+<div class="container mx-auto px-4 py-8">
+    <div class="hero bg-base-100 rounded-lg shadow-lg">
+        <div class="hero-content text-center">
+            <div class="max-w-md">
+                <h1 class="text-5xl font-bold mb-4">Welcome to Repair Tracker</h1>
+                <p class="text-lg mb-6">{{ greeting }}</p>
+                <div class="stats shadow bg-base-200">
+                    <div class="stat">
+                        <div class="stat-title">Total Repairs</div>
+                        <div class="stat-value">0</div>
+                        <div class="stat-desc">This month</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Pending</div>
+                        <div class="stat-value text-warning">0</div>
+                        <div class="stat-desc">Awaiting parts</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Completed</div>
+                        <div class="stat-value text-success">0</div>
+                        <div class="stat-desc">This week</div>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button class="btn btn-primary mr-2">Add New Repair</button>
+                    <button class="btn btn-outline">View All Repairs</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <div class="card bg-base-100 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title">Recent Repairs</h2>
+                <p class="text-base-content/70">No recent repairs to display</p>
+                <div class="card-actions justify-end">
+                    <button class="btn btn-sm btn-primary">View All</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card bg-base-100 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title">Devices</h2>
+                <p class="text-base-content/70">Manage your device inventory</p>
+                <div class="card-actions justify-end">
+                    <button class="btn btn-sm btn-primary">Manage</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card bg-base-100 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title">Schools</h2>
+                <p class="text-base-content/70">View connected schools</p>
+                <div class="card-actions justify-end">
+                    <button class="btn btn-sm btn-primary">View</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

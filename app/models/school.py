@@ -10,7 +10,6 @@ class SchoolBase(SQLModel, table=True):
     contact_name: str = Field(max_length=255)
     address: str = Field(max_length=500)
 
-
 class SchoolUpdate(SchoolBase):
     name: Optional[str] = Field(default=None, max_length=255)
     contact_name: Optional[str] = Field(default=None, max_length=255)
