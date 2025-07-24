@@ -6,7 +6,7 @@ import uuid
 
 router = APIRouter()
 
-@router.post("/", response_model=RepairPublic)
+@router.post("/new", response_model=RepairPublic)
 def create_repair(*, session: session_dep, repair: RepairCreate):
     db_repair = RepairBase.model_validate(repair)
     session.add(db_repair)
@@ -14,7 +14,7 @@ def create_repair(*, session: session_dep, repair: RepairCreate):
     session.refresh(db_repair)
     return db_repair
 
-@router.get("/", response_model=RepairsPublic)
+@router.get("/all", response_model=RepairsPublic)
 def list_repairs(*, session: session_dep):
     repairs = session.exec(select(RepairBase)).all()
     return RepairsPublic(data=repairs, count=len(repairs))
@@ -35,13 +35,4 @@ def update_repair(*, session: session_dep, repair_id: uuid.UUID, repair_update: 
     session.add(db_repair)
     session.commit()
     session.refresh(db_repair)
-    return db_repair
-
-@router.delete("/{repair_id}", response_model=RepairPublic)
-def delete_repair(*, session: session_dep, repair_id: uuid.UUID):
-    db_repair = session.get(RepairBase, repair_id)
-    if not db_repair:
-        raise HTTPException(status_code=404, detail="Repair not found")
-    session.delete(db_repair)
-    session.commit()
     return db_repair
