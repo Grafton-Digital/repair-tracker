@@ -1,81 +1,72 @@
 from enum import IntEnum
-from .school import SchoolPublic
-from .device import DevicePublic
-from .collection import CollectionPublic
-from .user import UserPublic
-
 from datetime import date, datetime
-from sqlmodel import SQLModel, Field
-from typing import List, Optional 
+from typing import Optional
 import uuid
-
-class RepairBase(SQLModel, table=True):
-    """Base model for repairs"""
-    __tablename__ = "repairs"
-
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    date_raised: date
-    school_id: uuid.UUID
-    device_serial: str = Field(max_length=255)
-    device_model_id: uuid.UUID
-    has_protective_case: bool = True
-    external_ticket_number: Optional[str] = Field(default=None, max_length=100)
-
-class RepairCreate(RepairBase):
-    pass
-
-class RepairUpdate(SQLModel):
-    status: Optional[int] = Field(default=None, ge=1, le=10)  # Assuming status range
-    date_closed: Optional[date] = Field(default=None)
-    school_id: Optional[uuid.UUID] = Field(default=None)
-    device_serial: Optional[str] = Field(default=None, max_length=255)
-    device_model_id: Optional[uuid.UUID] = Field(default=None)
-    has_protective_case: Optional[bool] = Field(default=None)
-    external_ticket_number: Optional[str] = Field(default=None, max_length=100)
-    is_sla_breached: Optional[bool] = Field(default=None)
-    inbound_collection_id: Optional[uuid.UUID] = Field(default=None)
-    outbound_collection_id: Optional[uuid.UUID] = Field(default=None)
-    inbound_date: Optional[date] = Field(default=None)
-    outbound_date: Optional[date] = Field(default=None)
-
-class RepairPublic(RepairBase):
-    id: uuid.UUID
-    status: int
-    creator_id: uuid.UUID
-    created_at: datetime
-    updated_at: datetime
-    date_closed: Optional[date]
-    is_sla_breached: bool
-    inbound_collection_id: Optional[uuid.UUID]
-    outbound_collection_id: Optional[uuid.UUID]
-    inbound_date: Optional[date]
-    outbound_date: Optional[date]
-
-class RepairWithRelations(RepairPublic):
-    """Extended repair model that includes related objects"""
-    creator: Optional["UserPublic"] = None
-    school: Optional[SchoolPublic] = None
-    device_model: Optional[DevicePublic] = None
-    inbound_collection: Optional[CollectionPublic] = None
-    outbound_collection: Optional[CollectionPublic] = None
-
-class RepairsPublic(SQLModel):
-    data: List[RepairPublic]
-    count: int
+from sqlmodel import Field, SQLModel
 
 class RepairStatus(IntEnum):
     """Enum for repair status values"""
     OPEN = 1
-    CLOSED = 2
-    # Add other status values as needed
+    PENDING = 2
+    CLOSED = 3
 
-# Special action models for repair workflow
-class RepairStatusUpdate(SQLModel):
-    status: int = Field(ge=1, le=10)
-    date_closed: Optional[date] = Field(default=None)
+class RepairBase(SQLModel):
+    """Base model for repairs"""
+    status:                 RepairStatus        = Field(nullable=False, default=RepairStatus.OPEN,                                description="Status of the repair", sa_column_kwargs={"server_default": str(RepairStatus.OPEN.value)})
+    external_ticket_number: Optional[str]       = Field(nullable=True,  default=None,                                             description="External ticket number for the repair")
 
-class RepairCollectionAssignment(SQLModel):
-    inbound_collection_id: Optional[uuid.UUID] = Field(default=None)
-    outbound_collection_id: Optional[uuid.UUID] = Field(default=None)
-    inbound_date: Optional[date] = Field(default=None)
-    outbound_date: Optional[date] = Field(default=None)
+class Repair(RepairBase, table=True):
+    """Table model for repairs"""
+    id:                     uuid.UUID           = Field(nullable=False, default_factory=uuid.uuid4, primary_key=True,             description="Unique identifier for the repair")
+    creator_id:             uuid.UUID           = Field(nullable=False, default_factory=None,       foreign_key="users.id",       description="ID of the user who created the repair")
+    created_at:             datetime            = Field(nullable=False, default_factory=date.today,                               description="Date the repair was created")
+    updated_at:             datetime            = Field(nullable=False, default_factory=date.today,                               description="Date the repair was last updated")
+    date_raised:            date                = Field(nullable=False, default_factory=None,                                     description="Date the repair was raised")
+    date_closed:            Optional[date]      = Field(nullable=True,  default=None,                                             description="Date the repair was closed")
+    school_id:              uuid.UUID           = Field(nullable=False, default_factory=None,       foreign_key="schools.id",     description="ID of the school associated with the repair")
+    device_serial:          str                 = Field(nullable=False, default_factory=None,                                     description="Serial number of the device associated with the repair")
+    device_model_id:        uuid.UUID           = Field(nullable=False, default_factory=None,       foreign_key="devices.id",     description="ID of the device model associated with the repair")
+    has_protective_case:    bool                = Field(nullable=False, default_factory=None,                                     description="Whether the device has a protective case")
+    is_sla_breached:        bool                = Field(nullable=False, default=False,                                            description="Whether the SLA for the repair has been breached")
+    inbound_collection_id:  Optional[uuid.UUID] = Field(nullable=True,  default=None,               foreign_key="collections.id", description="ID of the inbound collection associated with the repair")
+    outbound_collection_id: Optional[uuid.UUID] = Field(nullable=True,  default=None,               foreign_key="collections.id", description="ID of the outbound collection associated with the repair")
+    inbound_date:           Optional[date]      = Field(nullable=True,  default=None,                                             description="Date the inbound collection was received")
+    outbound_date:          Optional[date]      = Field(nullable=True,  default=None,                                             description="Date the outbound collection was sent")
+
+class RepairCreate(RepairBase):
+    """Model for creating a repair"""
+    school_id:              uuid.UUID           = Field(nullable=False,                             foreign_key="schools.id",     description="ID of the school associated with the repair")
+    device_serial:          str                 = Field(nullable=False,                                                           description="Serial number of the device associated with the repair")
+    device_model_id:        uuid.UUID           = Field(nullable=False,                             foreign_key="devices.id",     description="ID of the device model associated with the repair")
+    has_protective_case:    bool                = Field(nullable=False,                                                           description="Whether the device has a protective case")
+
+class RepairUpdate(RepairBase):
+    """Model for updating a repair"""
+    date_closed:            Optional[date]      = Field(default=None,                                                             description="Date the repair was closed")
+    inbound_collection_id:  Optional[uuid.UUID] = Field(default=None,                               foreign_key="collections.id", description="ID of the inbound collection associated with the repair")
+    outbound_collection_id: Optional[uuid.UUID] = Field(default=None,                               foreign_key="collections.id", description="ID of the outbound collection associated with the repair")
+    inbound_date:           Optional[date]      = Field(default=None,                                                             description="Date the inbound collection was received")
+    outbound_date:          Optional[date]      = Field(default=None,                                                                 description="Date the outbound collection was sent")
+
+class RepairPublic(RepairBase):
+    """Public model for a repair"""
+    id: uuid.UUID
+    creator_id: uuid.UUID
+    updated_at: datetime
+    created_at: datetime
+    date_raised: date
+    date_closed: Optional[date] = None
+    school_id: uuid.UUID
+    device_serial: str
+    device_model_id: uuid.UUID
+    has_protective_case: bool
+    is_sla_breached: bool
+    inbound_collection_id: Optional[uuid.UUID] = None
+    outbound_collection_id: Optional[uuid.UUID] = None
+    inbound_date: Optional[date] = None
+    outbound_date: Optional[date] = None
+
+class RepairsPublic(SQLModel):
+    """Public model for a list of repairs"""
+    data: list[RepairPublic]
+    count: int

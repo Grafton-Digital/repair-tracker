@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import Depends, APIRouter, HTTPException, Request, Response, Query, status
 from typing import Annotated, Any
 
@@ -10,7 +10,7 @@ from sqlmodel import Session
 from app.config import settings
 import jwt
 
-from app.models.user import Token, User, UserCreate, UserPublic, UserRegister, get_user_by_email, create_user
+from app.models.user import User, UserCreate, UserPublic, UserRegister, get_user_by_email, create_user
 from app.utils.dependencies import session_dep
 from app.utils.security import verify_password
 

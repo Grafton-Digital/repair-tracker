@@ -2,7 +2,7 @@ from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from app.routes import auth
+from app.routes import auth, repair
 from app.utils.dependencies import user_dep
 
 app = FastAPI()
@@ -19,3 +19,4 @@ async def renderIndex(request: Request, current_user: user_dep):
     )
 
 app.include_router(auth.router, prefix="/auth")
+app.include_router(repair.router, prefix="/repair")
