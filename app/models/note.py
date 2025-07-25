@@ -6,7 +6,7 @@ class NoteBase(SQLModel):
     """Base model for notes"""
     creator_id: uuid.UUID = Field(foreign_key="users.id", nullable=False)
     repair_id: uuid.UUID = Field(foreign_key="repairs.id", nullable=False)
-    text: str = Field(max_length=2000)
+    text: str = Field(max_length=4000)
 
 class Note(NoteBase, table=True):
     """Note model for database"""

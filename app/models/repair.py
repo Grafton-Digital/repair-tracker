@@ -17,6 +17,7 @@ class RepairBase(SQLModel):
 
 class Repair(RepairBase, table=True):
     """Table model for repairs"""
+    __tablename__ = 'repairs'
     id:                     uuid.UUID           = Field(nullable=False, default_factory=uuid.uuid4, primary_key=True,             description="Unique identifier for the repair")
     creator_id:             uuid.UUID           = Field(nullable=False, default_factory=None,       foreign_key="users.id",       description="ID of the user who created the repair")
     created_at:             datetime            = Field(nullable=False, default_factory=date.today,                               description="Date the repair was created")
