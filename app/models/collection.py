@@ -1,27 +1,25 @@
 from sqlmodel import SQLModel, Field
-from typing import List, Optional
+from typing import List
 import uuid
 
-class CollectionBase(SQLModel, table=True):
-    __tablename__ = "collections"
-    
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    origin: Optional[str] = Field(default=None, max_length=255)
-    destination: Optional[str] = Field(default=None, max_length=255)
-    collection_number: str = Field(max_length=100)
+class CollectionBase(SQLModel):
+	"""Base model for collections"""
+	collection_number: str = Field(max_length=100)
+	origin: str = Field(default=None)
+	destination: str = Field(default=None)
+	repair_id: uuid.UUID = Field(foreign_key="repairs.id", nullable=False)	
 
-class CollectionCreate(CollectionBase):
-    repair_id: uuid.UUID
-
-class CollectionUpdate(CollectionBase):
-    origin: Optional[str] = Field(default=None, max_length=255)
-    destination: Optional[str] = Field(default=None, max_length=255)
-    collection_number: Optional[str] = Field(default=None, max_length=100)
+class Collection(CollectionBase, table=True):
+	"""Collection model for database"""
+	__tablename__ = 'collections'
+	id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, nullable=False)
+	repair_id: uuid.UUID = Field(foreign_key="repairs.id", nullable=False)
 
 class CollectionPublic(CollectionBase):
+    """Public model for collections"""
     id: uuid.UUID
-    repair_id: uuid.UUID
 
 class CollectionsPublic(SQLModel):
+    """Public model for fetching a list of collections with count"""
     data: List[CollectionPublic]
     count: int

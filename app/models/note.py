@@ -1,28 +1,25 @@
-from .user import UserPublic
-
 from sqlmodel import SQLModel, Field
-from typing import List, Optional
+from typing import List
 import uuid
 
-class NoteBase(SQLModel, table=True):
+class NoteBase(SQLModel):
     """Base model for notes"""
-    __tablename__ = "notes"
-
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    creator_id: uuid.UUID
-    repair_id: uuid.UUID
+    creator_id: uuid.UUID = Field(foreign_key="users.id", nullable=False)
+    repair_id: uuid.UUID = Field(foreign_key="repairs.id", nullable=False)
     text: str = Field(max_length=2000)
 
-class NoteCreate(NoteBase):
-    repair_id: uuid.UUID
+class Note(NoteBase, table=True):
+    """Note model for database"""
+    __tablename__ = "notes"
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
-class NoteUpdate(NoteBase):
-    text: Optional[str] = Field(default=None, max_length=2000)
+class NotePublic(NoteBase):
+    """Public model for notes"""
+    id: uuid.UUID
 
-class NoteWithCreator(NoteBase):
-    """Note with creator information"""
-    creator: Optional["UserPublic"] = None
+class NoteUpdate(SQLModel):
+    text: str = Field(max_length=4000)
 
 class NotesPublic(SQLModel):
-    data: List[NoteBase]
+    data: List[NotePublic]
     count: int
