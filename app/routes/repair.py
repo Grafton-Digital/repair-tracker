@@ -1,14 +1,14 @@
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
-from app.models.repair import RepairBase, RepairCreate, RepairUpdate, RepairPublic, RepairsPublic
-from app.utils.dependencies import session_dep
+from app.models.repair import Repair, RepairBase, RepairCreate, RepairUpdate, RepairPublic, RepairsPublic
+from app.utils.dependencies import session_dep, user_dep
 import uuid
 
 router = APIRouter()
 
-@router.post("/new", response_model=RepairPublic)
-def create_repair(*, session: session_dep, repair: RepairCreate):
-    db_repair = RepairBase.model_validate(repair)
+@router.post("/", response_model=RepairPublic)
+def create_repair(*, session: session_dep, user: user_dep, repair: RepairCreate):
+    db_repair = Repair.model_validate(repair, update={"creator_id": user.id})
     session.add(db_repair)
     session.commit()
     session.refresh(db_repair)

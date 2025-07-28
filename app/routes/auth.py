@@ -76,6 +76,7 @@ def login(
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
     redirect_response.headers["HX-Redirect"] = next  # For HTMX handling
+    redirect_response.headers["access_token"] = access_token # Temporary: For fetching access_token in Swagger UI
 
     return redirect_response
 

@@ -8,7 +8,8 @@ class RepairStatus(IntEnum):
     """Enum for repair status values"""
     OPEN = 1
     PENDING = 2
-    CLOSED = 3
+    ON_HOLD = 3
+    CLOSED = 4
 
 class RepairBase(SQLModel):
     """Base model for repairs"""
@@ -40,14 +41,17 @@ class RepairCreate(RepairBase):
     device_serial:          str                 = Field(nullable=False,                                                           description="Serial number of the device associated with the repair")
     device_model_id:        uuid.UUID           = Field(nullable=False,                             foreign_key="devices.id",     description="ID of the device model associated with the repair")
     has_protective_case:    bool                = Field(nullable=False,                                                           description="Whether the device has a protective case")
+    date_raised:            date                = Field(nullable=False, default=None,                                             description="Date the repair was raised")
 
-class RepairUpdate(RepairBase):
+class RepairUpdate(SQLModel):
     """Model for updating a repair"""
-    date_closed:            Optional[date]      = Field(default=None,                                                             description="Date the repair was closed")
-    inbound_collection_id:  Optional[uuid.UUID] = Field(default=None,                               foreign_key="collections.id", description="ID of the inbound collection associated with the repair")
-    outbound_collection_id: Optional[uuid.UUID] = Field(default=None,                               foreign_key="collections.id", description="ID of the outbound collection associated with the repair")
-    inbound_date:           Optional[date]      = Field(default=None,                                                             description="Date the inbound collection was received")
-    outbound_date:          Optional[date]      = Field(default=None,                                                                 description="Date the outbound collection was sent")
+    status:                 Optional[RepairStatus] = Field(default=None,                                                             description="Status of the repair")
+    external_ticket_number: Optional[str]          = Field(default=None,                                                             description="External ticket number for the repair")
+    date_closed:            Optional[date]         = Field(default=None,                                                             description="Date the repair was closed")
+    inbound_collection_id:  Optional[uuid.UUID]    = Field(default=None,                               foreign_key="collections.id", description="ID of the inbound collection associated with the repair")
+    outbound_collection_id: Optional[uuid.UUID]    = Field(default=None,                               foreign_key="collections.id", description="ID of the outbound collection associated with the repair")
+    inbound_date:           Optional[date]         = Field(default=None,                                                             description="Date the inbound collection was received")
+    outbound_date:          Optional[date]         = Field(default=None,                                                             description="Date the outbound collection was sent")
 
 class RepairPublic(RepairBase):
     """Public model for a repair"""
