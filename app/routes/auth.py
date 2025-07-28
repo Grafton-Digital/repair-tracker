@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import Depends, APIRouter, HTTPException, Request, Response, Query, status
 from typing import Annotated, Any
@@ -33,7 +33,7 @@ def create_access_token(subject: str | Any, expires_delta: timedelta) -> str:
 router = APIRouter()
 
 @router.get("/login", response_class=HTMLResponse)
-async def renderLogin(request: Request, next: str = Query(default="/")):
+async def render_login(request: Request, next: str = Query(default="/")):
     """
     Render the login page.
     """
@@ -45,21 +45,29 @@ async def renderLogin(request: Request, next: str = Query(default="/")):
         }
     )
 
-@router.post("/login", response_class=RedirectResponse)
+@router.post("/login")
 def login(
-    response: Response,
+    request: Request,
     session: session_dep,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     next: str = Query(default="/")
-):
+) -> Response:
     user = authenticate(session=session, email=form_data.username, password=form_data.password)
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
-    
+        # return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
+        return templates.TemplateResponse(
+            name="partials/login_error.html",
+            context={
+                "request": request
+            },
+            status_code=status.HTTP_401_UNAUTHORIZED
+        )
+
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(subject=user.id, expires_delta=access_token_expires)
     
-    response.set_cookie(
+    redirect_response = HTMLResponse(status_code=status.HTTP_200_OK)
+    redirect_response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
@@ -67,14 +75,12 @@ def login(
         samesite="lax",
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
+    redirect_response.headers["HX-Redirect"] = next  # For HTMX handling
 
-    # Redirect to the original page after login
-    response.headers["Location"] = next
-    response.status_code = status.HTTP_303_SEE_OTHER
-    return response
+    return redirect_response
 
 @router.get("/register")
-def renderRegister():
+def render_Register():
     pass
 
 @router.post("/register", response_model=UserPublic)
