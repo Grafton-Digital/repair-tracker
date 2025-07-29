@@ -24,7 +24,7 @@ def repairs_page(request: Request, session: session_dep):
         select(Repair).order_by(Repair.created_at.desc()).limit(10)
     ).all()
     return templates.TemplateResponse(
-        "views/repairs.html", 
+        "views/repair_overview.html", 
         {"request": request, "repairs": repairs}
     )
 
@@ -38,7 +38,7 @@ def list_repairs(*, session: session_dep, limit: int = None):
 
 @router.get("/{repair_id}", response_model=RepairPublic)
 def get_repair(*, session: session_dep, repair_id: uuid.UUID):
-    repair = session.get(RepairBase, repair_id)
+    repair = session.get(Repair, repair_id)
     if not repair:
         raise HTTPException(status_code=404, detail="Repair not found")
     return repair
