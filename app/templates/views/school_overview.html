@@ -1,0 +1,60 @@
+{% extends "layouts/default.html" %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold">Schools</h1>
+        <button class="btn btn-primary">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            New School
+        </button>
+    </div>
+
+    <!-- Repairs Table -->
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <div class="overflow-x-auto">
+                <table class="table table-zebra">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact Name</th>
+                            <th>Address</th>
+                        </tr>
+                    </thead>
+                    <tbody hx-target="closest tr" hx-swap="outerHTML">
+                        {% for school in schools %}
+                        <tr>
+                            <td>
+                                <div class="font-medium">{{ school.name }}</div>
+                            </td>
+                            <td>
+                                <div class="text-sm">{{ school.contact_name }}</div>
+                            </td>
+                            <td>
+                                <div class="text-sm">{{ school.address }}</div>
+                            </td>
+                            <td>
+                                <button class="btn btn-neutral" hx-get="/school/{{ school.id }}/edit">
+                                    Edit
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if not schools %}
+                        <tr>
+                            <td colspan="7" class="text-center py-8 text-base-content/60">
+                                No schools found. Create your first school to get started.
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

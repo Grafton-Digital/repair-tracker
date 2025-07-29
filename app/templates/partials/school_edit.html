@@ -1,0 +1,19 @@
+<tr>
+    <td>
+        <input autofocus name='name' class="font-medium" value="{{ school.name }}">
+    </td>
+    <td>
+        <input name='contact_name' class="text-sm" value="{{ school.contact_name }}">
+    </td>
+    <td>
+        <input name='address' class="text-sm" value="{{ school.address }}">
+    </td>
+    <td>
+        <button class="btn btn-primary" hx-patch="/school/{{ school.id }}" hx-include="closest tr" hx-target="body" hx-swap="outerHTML">
+            Save
+        </button>
+        <button class="btn btn-ghost" hx-get="/school/{{ school.id }}">
+            Cancel
+        </button>
+    </td>
+</tr>
