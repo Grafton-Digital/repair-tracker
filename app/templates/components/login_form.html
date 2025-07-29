@@ -7,8 +7,8 @@
                 class="space-y-4"
                 hx-post="/auth/login?next={{ next | default('/') }}"
                 hx-target="#login-response"
-                hx-swap="outerHTML"
                 hx-redirect="true"
+                hx-disabled-elt="find button[type='submit']"
             >
                 <div class="form-control">
                     <label class="label" for="username">

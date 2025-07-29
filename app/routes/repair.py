@@ -1,10 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from sqlmodel import select
 from app.models.repair import Repair, RepairBase, RepairCreate, RepairUpdate, RepairPublic, RepairsPublic
 from app.utils.dependencies import session_dep, user_dep
 import uuid
 
 router = APIRouter()
+templates = Jinja2Templates(directory="app/templates")
 
 @router.post("/", response_model=RepairPublic)
 def create_repair(*, session: session_dep, user: user_dep, repair: RepairCreate):
@@ -14,9 +17,23 @@ def create_repair(*, session: session_dep, user: user_dep, repair: RepairCreate)
     session.refresh(db_repair)
     return db_repair
 
+@router.get("/", response_class=HTMLResponse)
+def repairs_page(request: Request, session: session_dep):
+    # Get 10 most recent repairs
+    repairs = session.exec(
+        select(Repair).order_by(Repair.created_at.desc()).limit(10)
+    ).all()
+    return templates.TemplateResponse(
+        "views/repairs.html", 
+        {"request": request, "repairs": repairs}
+    )
+
 @router.get("/all", response_model=RepairsPublic)
-def list_repairs(*, session: session_dep):
-    repairs = session.exec(select(RepairBase)).all()
+def list_repairs(*, session: session_dep, limit: int = None):
+    query = select(Repair).order_by(Repair.created_at.desc())
+    if limit:
+        query = query.limit(limit)
+    repairs = session.exec(query).all()
     return RepairsPublic(data=repairs, count=len(repairs))
 
 @router.get("/{repair_id}", response_model=RepairPublic)
