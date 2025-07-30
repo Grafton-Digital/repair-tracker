@@ -76,7 +76,7 @@ def login(
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
     redirect_response.headers["HX-Redirect"] = next  # For HTMX handling
-    redirect_response.headers["access_token"] = access_token # Temporary: For fetching access_token in Swagger UI
+    redirect_response.headers["access_token"] = access_token # TO-DO: Temporary, for fetching access_token in Swagger UI
 
     return redirect_response
 
@@ -101,3 +101,15 @@ def register(session: session_dep, new_user: UserRegister):
     )
     user = create_user(session=session, user_create=user_create)
     return user
+
+@router.post("/logout")
+def logout(request: Request):
+    """
+    Log out the user by clearing the access token cookie.
+    TO-DO: This is complete and utter garbage - come back later and implement Refresh Tokens.
+    No Refresh Token = No Access Token = No Access to Protected Routes
+    """
+    response = HTMLResponse(status_code=status.HTTP_200_OK)
+    response.delete_cookie("access_token")
+    response.headers["HX-Redirect"] = "/auth/login"
+    return response
