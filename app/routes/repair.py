@@ -24,7 +24,7 @@ def repairs_page(request: Request, session: session_dep):
         select(Repair).order_by(Repair.created_at.desc()).limit(10)
     ).all()
     return templates.TemplateResponse(
-        "views/repair_overview.html", 
+        "components/repair_overview.html", 
         {"request": request, "repairs": repairs}
     )
 

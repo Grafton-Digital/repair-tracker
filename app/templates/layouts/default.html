@@ -7,11 +7,12 @@
 <body>
     <div class="flex bg-gray-900">
         <!-- Navigation sidebar -->
-        {% include "components/header.html" %}
+        {% include "components/nav.html" %}        
 
         <!-- Page content -->
         <main class="flex-1 p-6">
-            {% block content %}{% endblock %}
+            <div id="notification-container" hx-swap="beforeend"></div>
+            <div id="content">{% block content %}{% endblock %}</div>
         </main>
     </div>
 </body>
