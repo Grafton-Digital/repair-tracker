@@ -73,7 +73,6 @@ def update_school(*, session: session_dep, school_id: uuid.UUID, school_update: 
         }
     )
 
-# Come back and validate school has no repairs tied to it before deleting
 @router.delete("/{school_id}", response_class=HTMLResponse)
 def delete_school(*, request: Request, session: session_dep, school_id: uuid.UUID):
     associated_repairs = session.exec(

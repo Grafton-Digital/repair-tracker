@@ -1,9 +1,9 @@
 from pathlib import Path
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from app.routes import auth, repair, school, note, device, collection
-from app.utils.dependencies import user_dep
+from app.utils.dependencies import user_dep, get_current_user
 
 app = FastAPI()
 templates = Jinja2Templates(directory=Path("app") / "templates")
@@ -19,8 +19,8 @@ async def renderIndex(request: Request, current_user: user_dep):
     )
 
 app.include_router(auth.router, prefix="/auth")
-app.include_router(repair.router, prefix="/repair")
-app.include_router(school.router, prefix="/school")
-app.include_router(note.router, prefix="/note")
-app.include_router(device.router, prefix="/device")
-app.include_router(collection.router, prefix="/collection")
+app.include_router(repair.router, prefix="/repair", dependencies=[Depends(get_current_user)])
+app.include_router(school.router, prefix="/school", dependencies=[Depends(get_current_user)])
+app.include_router(note.router, prefix="/note", dependencies=[Depends(get_current_user)])
+app.include_router(device.router, prefix="/device", dependencies=[Depends(get_current_user)])
+app.include_router(collection.router, prefix="/collection", dependencies=[Depends(get_current_user)])

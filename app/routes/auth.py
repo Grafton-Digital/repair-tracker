@@ -80,10 +80,12 @@ def login(
 
     return redirect_response
 
+# TO-DO: Delete this or implement it with a registration key from .env
 @router.get("/register")
 def render_Register():
     pass
 
+# TO-DO: Don't allow arbitrary user registration, restrict to superusers via admin UI
 @router.post("/register", response_model=UserPublic)
 def register(session: session_dep, new_user: UserRegister):
     """
