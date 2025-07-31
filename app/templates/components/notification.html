@@ -1,5 +1,5 @@
 {% if message %}
-<div role="alert" class="alert alert-{{ type or 'info' }} mb-4">
+<div role="alert" class="alert alert-{{ type or 'info' }} mb-4" data-auto-dismiss="{{ auto_dismiss|default('true') }}" data-dismiss-timeout="{{ dismiss_timeout|default('5000') }}">
   {% if type == 'success' %}
     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -32,16 +32,4 @@
     </svg>
   </button>
 </div>
-
-<script>
-function dismissNotification(notification) {
-  if (notification) {
-    notification.style.transition = 'opacity 0.3s ease-out';
-    notification.style.opacity = '0';
-    setTimeout(() => {
-      notification.remove();
-    }, 300);
-  }
-}
-</script>
 {% endif %}

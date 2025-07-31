@@ -3,7 +3,7 @@ from fastapi import APIRouter, Form, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from app.models.repair import Repair
-from app.models.school import School, SchoolBase, SchoolUpdate, SchoolPublic, SchoolsPublic
+from app.models.school import School, SchoolBase, SchoolUpdate
 from sqlmodel import select
 from app.utils.dependencies import session_dep
 import uuid
@@ -45,16 +45,16 @@ def edit_school(*, session: session_dep, school_id: uuid.UUID, request: Request)
 #
 
 @router.post("/", response_class=HTMLResponse)
-def create_school(*, session: session_dep, school: Annotated[SchoolBase, Form()]):
+def create_school(*, request: Request, session: session_dep, school: Annotated[SchoolBase, Form()]):
     db_school = School.model_validate(school)
     session.add(db_school)
     session.commit()
     session.refresh(db_school)
-    return HTMLResponse(
+    return templates.TemplateResponse(
+        name="components/notification.html",
+        context={"request": request, "message": "School created successfully!", "type": "success"},
         status_code=status.HTTP_201_CREATED,
-        headers={
-            "HX-Trigger": "refreshOverview"
-        }
+        headers={"HX-Trigger": "refreshOverview"}
     )
 
 @router.patch("/{school_id}", response_class=HTMLResponse)

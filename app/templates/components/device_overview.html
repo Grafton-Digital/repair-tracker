@@ -39,6 +39,7 @@
                                         hx-delete="/device/{{ device.id }}"
                                         hx-confirm="Are you sure you want to delete this device?"
                                         hx-target="#notification-container"
+                                        hx-swap="beforeend"
                                     >
                                         Delete
                                     </button>
@@ -67,6 +68,8 @@
                     hx-post="/device"
                     hx-on::after-request="device_modal.close()"
                     hx-trigger="submit"
+                    hx-target="#notification-container"
+                    hx-swap="beforeend"
                 >
                     <div class="form-control">
                         <label class="label">

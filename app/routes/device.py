@@ -28,17 +28,23 @@ def device_overview(*, session: session_dep, request: Request):
 #
 
 @router.post("/", response_class=HTMLResponse)
-def create_device(*, session: session_dep, device: Annotated[DeviceBase, Form()]):
+def create_device(*, request: Request, session: session_dep, device: Annotated[DeviceBase, Form()]):
     db_device = Device.model_validate(device)
     session.add(db_device)
     session.commit()
     session.refresh(db_device)
-    return HTMLResponse(
-        status_code=status.HTTP_201_CREATED,
-        headers={
-            "HX-Trigger": "refreshOverview"
-        }
+    return templates.TemplateResponse(
+        name="components/notification.html",
+        context={"request": request, "message": "Device created successfully!", "type": "success"},
+        headers={"HX-Trigger": "refreshOverview"},
+        status_code=status.HTTP_201_CREATED
     )
+    # return HTMLResponse(
+    #     status_code=status.HTTP_201_CREATED,
+    #     headers={
+    #         "HX-Trigger": "refreshOverview"
+    #     }
+    # )
 
 # Not in use yet
 # @router.get("/{device_id}", response_model=DevicePublic)

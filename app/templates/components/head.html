@@ -4,6 +4,22 @@
 <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+<script>
+    function dismissNotification(notification) {
+        notification.style.transition = 'opacity 0.3s ease-out';
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+    }
+
+    // Auto-dismiss functionality
+    document.addEventListener('htmx:afterSwap', function() {
+        const notifications = document.querySelectorAll('div[role="alert"][data-auto-dismiss="true"]');
+        notifications.forEach(notification => {
+            const timeout = parseInt(notification.dataset.dismissTimeout) || 5000;
+            setTimeout(() => dismissNotification(notification), timeout);
+        });
+    });
+</script>
 <meta name="htmx-config" content='
     {
         "responseHandling": [

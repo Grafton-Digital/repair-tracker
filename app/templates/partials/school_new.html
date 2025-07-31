@@ -3,6 +3,8 @@
     hx-post="/school"
     hx-on::after-request="school_modal.close()"
     hx-trigger="submit"
+    hx-target="#notification-container"
+    hx-swap="beforeend"
 >
     <div class="form-control">
         <label class="label">
