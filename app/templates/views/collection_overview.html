@@ -1,0 +1,125 @@
+<div hx-trigger="refreshOverview from:body" hx-get="/collection/overview" hx-swap="outerHTML">
+    <div class="space-y-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Collections</h1>
+            <button class="btn btn-primary"
+                onclick="collection_modal.showModal()"
+            >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                New Collection
+            </button>
+        </div>
+
+        <!-- Repairs Table -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra">
+                        <thead>
+                            <tr>
+                                <th>Collection Number</th>
+                                <th>Origin</th>
+                                <th>Destination</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for collection in collections %}
+                            <tr>
+                                <td>
+                                    <div class="font-medium">{{ collection.collection_number }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-sm">{{ collection.origin }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-sm">{{ collection.destination }}</div>
+                                </td>
+                                <td>
+                                    <button
+                                        class="btn btn-error"
+                                        hx-delete="/collection/{{ collection.id }}"
+                                        hx-confirm="Are you sure you want to delete this collection?"
+                                        hx-target="#notification-container"
+                                        hx-swap="beforeend"
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not collections %}
+                            <tr>
+                                <td colspan="7" class="text-center py-8 text-base-content/60">
+                                    No collections found. Create your first collection to get started.
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <dialog id="collection_modal" class="modal">
+        <div class="modal-box w-11/12 max-w-2xl">
+            <div id="collection-modal-content">
+                <h3 class="font-bold text-lg mb-4">Create Collection</h3>
+                <form class="space-y-4"
+                    hx-post="/collection"
+                    hx-on::after-request="collection_modal.close()"
+                    hx-trigger="submit"
+                    hx-target="#notification-container"
+                    hx-swap="beforeend"
+                >
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Collection Number</span>
+                        </label>
+                        <input 
+                            autofocus 
+                            name="collection_number" 
+                            type="text" 
+                            class="input input-bordered w-full"
+                            placeholder="Enter collection number"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Collection Origin</span>
+                        </label>
+                        <input 
+                            name="origin" 
+                            type="text" 
+                            class="input input-bordered w-full"
+                            placeholder="Enter collection origin"
+                        >
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Collection Destination</span>
+                        </label>
+                        <input 
+                            name="destination" 
+                            type="text" 
+                            class="input input-bordered w-full"
+                            placeholder="Enter collection destination"
+                        >
+                    </div>
+
+                    <div class="modal-action">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-ghost" onclick="collection_modal.close()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </dialog>
+
+</div>

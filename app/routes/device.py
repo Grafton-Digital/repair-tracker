@@ -39,12 +39,6 @@ def create_device(*, request: Request, session: session_dep, device: Annotated[D
         headers={"HX-Trigger": "refreshOverview"},
         status_code=status.HTTP_201_CREATED
     )
-    # return HTMLResponse(
-    #     status_code=status.HTTP_201_CREATED,
-    #     headers={
-    #         "HX-Trigger": "refreshOverview"
-    #     }
-    # )
 
 # Not in use yet
 # @router.get("/{device_id}", response_model=DevicePublic)
@@ -55,7 +49,7 @@ def create_device(*, request: Request, session: session_dep, device: Annotated[D
 #     return device
 
 # Come back later and validate device has no repairs tied to it before deleting
-@router.delete("/{device_id}", response_model=DevicePublic)
+@router.delete("/{device_id}", response_class=HTMLResponse)
 def delete_device(*, request: Request, session: session_dep, device_id: uuid.UUID):
     associated_repairs = session.exec(
         select(Repair).where(Repair.device_model_id == device_id)
