@@ -26,7 +26,7 @@ def school_overview(*, session: session_dep, request: Request):
 @router.get("/new", response_class=HTMLResponse)
 def new_school(*, request: Request):
     return templates.TemplateResponse(
-        "partials/school_new.html",
+        "views/school_new.html",
         {"request": request}
     )
 

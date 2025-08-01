@@ -1,0 +1,96 @@
+<div hx-trigger="refreshOverview from:body" hx-get="/repair/overview" hx-swap="outerHTML">
+    <div class="space-y-6">
+        <!-- Header -->
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Recent Repairs</h1>
+            <button class="btn btn-primary"
+                hx-get="/repair/new"
+                hx-target="#repair-modal-content"
+                hx-swap="innerHTML"
+                hx-on::before-request="repair_modal.showModal()"
+            >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                New Repair
+            </button>
+        </div>
+
+        <!-- Repairs Table -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra">
+                        <thead>
+                            <tr>
+                                <th>Device Serial</th>
+                                <th>Status</th>
+                                <th>External Ticket</th>
+                                <th>Date Raised</th>
+                                <th>Date Closed</th>
+                                <th>SLA Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for repair in repairs %}
+                            <tr>
+                                <td>
+                                    <div class="font-medium">{{ repair.device_serial }}</div>
+                                    <div class="text-sm opacity-50">{{ 'With Case' if repair.has_protective_case else 'No Case' }}</div>
+                                </td>
+                                <td>
+                                    <div class="badge badge-{{ 'success' if repair.status == 4 else 'warning' if repair.status == 2 else 'error' if repair.status == 3 else 'ghost' }}">
+                                        {{ 'Closed' if repair.status == 4 else 'Pending' if repair.status == 2 else 'On Hold' if repair.status == 3 else 'Open' }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-sm">{{ repair.external_ticket_number or 'N/A' }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-sm">{{ repair.date_raised.strftime('%m/%d/%Y') if repair.date_raised else 'N/A' }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-sm">{{ repair.date_closed.strftime('%m/%d/%Y') if repair.date_closed else 'Open' }}</div>
+                                </td>
+                                <td>
+                                    <div class="badge badge-{{ 'error' if repair.is_sla_breached else 'success' }}">
+                                        {{ 'Breached' if repair.is_sla_breached else 'OK' }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-info btn-xs"
+                                        hx-get="/repair/{{ repair.id }}"
+                                        hx-target="#content"
+                                        hx-swap="innerHTML"
+                                    >
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not repairs %}
+                            <tr>
+                                <td colspan="7" class="text-center py-8 text-base-content/60">
+                                    No repairs found. Create your first repair to get started.
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <dialog id="repair_modal" class="modal">
+        <div class="modal-box w-11/12 max-w-2xl">
+            <div id="repair-modal-content">
+                <!-- Content will be loaded via HTMX -->
+                <div class="flex justify-center items-center py-8">
+                    <span class="loading loading-spinner loading-md"></span>
+                </div>
+            </div>
+        </div>
+    </dialog>
+</div>

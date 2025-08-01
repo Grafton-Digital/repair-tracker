@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlmodel import SQLModel, Field
 from typing import List
 import uuid
@@ -12,6 +13,7 @@ class Note(NoteBase, table=True):
     __tablename__ = "notes"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     creator_id: uuid.UUID = Field(foreign_key="users.id", nullable=False)
+    created_at: datetime = Field(default_factory=datetime.now)
 
 class NotePublic(NoteBase):
     """Public model for notes"""

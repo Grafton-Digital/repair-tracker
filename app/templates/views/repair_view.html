@@ -1,0 +1,159 @@
+<div class="container mx-auto p-6 space-y-6">
+    <!-- Header with Back Button -->
+    <div class="flex items-center space-x-4">
+        <button class="btn btn-ghost btn-circle" 
+                hx-get="/repair/overview" 
+                hx-target="#content" 
+                hx-swap="innerHTML">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </button>
+        <h1 class="text-3xl font-bold">Repair Details</h1>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-1 gap-6">
+        <!-- Main Repair Details -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Repair Information Card -->
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="card-title">Repair Information</h2>
+                        <div id="edit-controls">
+                            <button class="btn btn-primary btn-sm"
+                                    hx-get="/repair/{{ repair.id }}/edit-form"
+                                    hx-target="#repair-form-container"
+                                    hx-swap="innerHTML">
+                                Edit
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="repair-form-container">
+                        <!-- View Mode -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="label">
+                                    <span class="label-text font-semibold">Device Serial</span>
+                                </label>
+                                <div class="text-lg">{{ repair.device_serial }}</div>
+                            </div>
+                            
+                            <div>
+                                <label class="label">
+                                    <span class="label-text font-semibold">Status</span>
+                                </label>
+                                <div class="badge badge-{{ 'success' if repair.status == 4 else 'warning' if repair.status == 2 else 'error' if repair.status == 3 else 'ghost' }} badge-lg">
+                                    {{ 'Closed' if repair.status == 4 else 'Pending' if repair.status == 2 else 'On Hold' if repair.status == 3 else 'Open' }}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="label">
+                                    <span class="label-text font-semibold">External Ticket</span>
+                                </label>
+                                <div class="text-lg">{{ repair.external_ticket_number or 'N/A' }}</div>
+                            </div>
+                            
+                            <div>
+                                <label class="label">
+                                    <span class="label-text font-semibold">Protective Case</span>
+                                </label>
+                                <div class="badge badge-{{ 'success' if repair.has_protective_case else 'ghost' }}">
+                                    {{ 'Yes' if repair.has_protective_case else 'No' }}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="label">
+                                    <span class="label-text font-semibold">Date Raised</span>
+                                </label>
+                                <div class="text-lg">{{ repair.date_raised.strftime('%m/%d/%Y') if repair.date_raised else 'N/A' }}</div>
+                            </div>
+                            
+                            <div>
+                                <label class="label">
+                                    <span class="label-text font-semibold">Date Closed</span>
+                                </label>
+                                <div class="text-lg">{{ repair.date_closed.strftime('%m/%d/%Y') if repair.date_closed else 'Not Closed' }}</div>
+                            </div>
+                            
+                            <div>
+                                <label class="label">
+                                    <span class="label-text font-semibold">SLA Status</span>
+                                </label>
+                                <div class="badge badge-{{ 'error' if repair.is_sla_breached else 'success' }} badge-lg">
+                                    {{ 'Breached' if repair.is_sla_breached else 'OK' }}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="label">
+                                    <span class="label-text font-semibold">Inbound Date</span>
+                                </label>
+                                <div class="text-lg">{{ repair.inbound_date.strftime('%m/%d/%Y') if repair.inbound_date else 'N/A' }}</div>
+                            </div>
+                            
+                            <div>
+                                <label class="label">
+                                    <span class="label-text font-semibold">Outbound Date</span>
+                                </label>
+                                <div class="text-lg">{{ repair.outbound_date.strftime('%m/%d/%Y') if repair.outbound_date else 'N/A' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="space-y-6">
+            <!-- Add Note Card
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    
+                </div>
+            </div> -->
+
+            <!-- Notes List -->
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <h3 class="card-title text-lg">Add Note</h3>
+                    <form hx-post="/repair/{{ repair.id }}/notes" 
+                          hx-target="#notes-list" 
+                          hx-swap="afterbegin"
+                          hx-on::after-request="this.reset()"
+                          class="w-full">
+                        <div class="form-control w-full">
+                            <textarea name="content" 
+                                    class="textarea textarea-bordered h-24 w-full" 
+                                    placeholder="Enter your note..."
+                                    required></textarea>
+                        </div>
+                        <div class="form-control mt-4">
+                            <button type="submit" class="btn btn-primary btn-sm float-right">Add Note</button>
+                        </div>
+                    </form>
+
+                    <h3 class="card-title text-lg">Notes</h3>
+                    <div id="notes-list" class="space-y-3 max-h-96 overflow-y-auto">
+                        {% for note in notes %}
+                        <div class="border border-base-300 rounded-lg p-3">
+                            <div class="text-sm opacity-70 mb-1">
+                                {{ note.created_at.strftime('%m/%d/%Y %I:%M %p') if note.created_at else 'Unknown date' }}
+                            </div>
+                            <div class="text-sm">{{ note.content }}</div>
+                        </div>
+                        {% endfor %}
+                        {% if not notes %}
+                        <div class="text-center text-base-content/60 py-4">
+                            No notes yet. Add the first note above.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

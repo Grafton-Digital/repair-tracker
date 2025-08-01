@@ -1,9 +1,9 @@
 from typing import Annotated
-from fastapi import APIRouter, Form, HTTPException, Request, status
+from fastapi import APIRouter, Form, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlmodel import select
-from app.models.device import Device, DeviceBase, DevicePublic, DevicesPublic
+from app.models.device import Device, DeviceBase
 from app.models.repair import Repair
 from app.utils.dependencies import session_dep
 import uuid
@@ -19,7 +19,7 @@ templates = Jinja2Templates(directory="app/templates")
 def device_overview(*, session: session_dep, request: Request):
     devices = session.exec(select(Device)).all()
     return templates.TemplateResponse(
-        "components/device_overview.html",
+        "views/device_overview.html",
         {"request": request, "devices": devices}
     )
 
