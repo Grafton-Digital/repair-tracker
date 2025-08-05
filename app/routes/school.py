@@ -19,7 +19,7 @@ templates = Jinja2Templates(directory="app/templates")
 def school_overview(*, session: session_dep, request: Request):
     schools = session.exec(select(School)).all()
     return templates.TemplateResponse(
-        "components/school_overview.html",
+        "views/school_overview.html",
         {"request": request, "schools": schools}
     )
 

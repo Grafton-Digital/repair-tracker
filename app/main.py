@@ -1,11 +1,14 @@
 from pathlib import Path
 from fastapi import Depends, FastAPI, Request
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from app.routes import auth, repair, school, note, device, collection
 from app.utils.dependencies import user_dep, get_current_user
 
 app = FastAPI()
+app.mount("/public", StaticFiles(directory=Path("app") / "public"), name="public")
+
 templates = Jinja2Templates(directory=Path("app") / "templates")
 
 @app.get("/", response_class=HTMLResponse)
